@@ -166,9 +166,9 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_dir", type=str, 
-                        help="The directory where the files are that need preprocessing", required=True)
+                        help="The directory where the files are that need lines", required=True)
     parser.add_argument("--output_dir", type=str, 
-                        help="The directory where the preprocessed images should be saved", required=True)
+                        help="The directory where the lines/graph images should be saved", required=True)
     parser.add_argument("--line_color", type=str,
                         help="Denotes color of the lines, if None: randomizes line color from preset \
                               selection", default='k')
