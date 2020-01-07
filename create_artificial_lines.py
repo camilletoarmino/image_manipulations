@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
@@ -150,10 +150,15 @@ def add_lines(image, args):
 
     # save fig
     plt.axis('off')
-    plt.imshow(im, cmap='Greys_r')
-    filename = os.path.join(args.output_dir, image)
     plt.margins(0,0)
     plt.tight_layout(pad=0)
+    
+    plt.imshow(im, cmap='Greys_r')
+    
+    if args.quick_test is True:
+        plt.show()
+     
+    filename = os.path.join(args.output_dir, image)
     plt.savefig(filename, bbox_inches="tight", pad_inches=0)
 
 
@@ -175,11 +180,13 @@ def parse_args():
     parser.add_argument("--line_width", type=int,
                         help="Denotes the width of the lines per image, if None: randomizes line width from \
                               preset selection", default=None)
-    parser.add_argument("--quick_test", type=bool,
-                        help="Takes a boolean value: if true, then \
-                              only one image is processed and plotted, \
-                              if false, all are processed",
-                        default=True, choices=[True, False])
+    parser.add_argument("--quick_test", action='store_true',
+                        help="If --quick_test is used, only a select number of images are processed \
+                              otherwise iall images in the input directory will be processed")
+    parser.add_argument("--quick_test_number", type=int,
+                        help="The number of images to display when performing \
+                              a quick test",
+                        default=5)
     return parser.parse_args()
 
 
@@ -196,7 +203,7 @@ if __name__ == "__main__":
     image_files = os.listdir(args.input_dir)
 
     if args.quick_test == True:
-        for image in image_files[0:1]:
+        for image in image_files[0:args.quick_test_number]:
             add_lines(image, args)
     else:
         for image in tqdm(image_files):

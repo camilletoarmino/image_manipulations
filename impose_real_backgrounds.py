@@ -72,22 +72,33 @@ def add_background(image, args, background_files):
     
     # get handwriting image size
     img_width, img_height = handwriting_img.size
-
-    # setting the points for cropped image to match handwriting size
-    left = 0
-    top = 0
-    right = img_width
-    bottom = img_height
-
-    # crop image to above dimension  
-    background = background.crop((left, top, right, bottom)) 
     
-    # paste handwriting image onto background
-    background.paste(handwriting_img, (0, 0), handwriting_img)
+    if background_width > img_width:
+        # setting the points for cropped image to match handwriting size
+        left = 0
+        top = 0
+        right = img_width
+        bottom = img_height
 
-    # save image
-    plt.imshow(background)
-    plt.axis('off') 
+        # crop image to above dimension  
+        background = background.crop((left, top, right, bottom)) 
+
+        # paste val image onto background
+        background.paste(handwriting_img, (0, 0), handwriting_img)
+        
+        # save image
+        plt.imshow(background)
+    else:
+        # save image
+        plt.imshow(handwriting_img)
+    
+    plt.axis('off')
+    plt.margins(0,0)
+    plt.tight_layout(pad=0)
+
+    if args.quick_test is True:
+        plt.show()
+     
     save_filename = os.path.join(args.output_dir, os.path.splitext(image)[0]) + '.jpg'
     plt.savefig(save_filename, bbox_inches='tight', pad_inches=0)
 
@@ -106,14 +117,16 @@ def parse_args():
                         help="The directory where the real background files are", required=True)
     parser.add_argument("--output_dir", type=str, 
                         help="The directory where the superimposed images should be saved", required=True)
-    parser.add_argument("--add_handwriting_colors", type=bool,
+    parser.add_argument("--add_handwriting_colors", action='store_true',
                         help="If True, randomly choose from 4 different colors to simulate different colored \
-                              pens and pencils", default=False)
-    parser.add_argument("--quick_test", type=bool,
-                        help="Takes a boolean value: if true, then \
-                              only one image is processed and plotted, \
-                              if false, all are processed",
-                        default=True)
+                              pens and pencils")
+    parser.add_argument("--quick_test", action='store_true',
+                        help="If --quick_test is used, only a select number of images are processed \
+                              otherwise iall images in the input directory will be processed")
+    parser.add_argument("--quick_test_number", type=int,
+                        help="The number of images to display when performing \
+                              a quick test",
+                        default=5)
     return parser.parse_args()
 
 
@@ -130,7 +143,7 @@ if __name__ == "__main__":
     background_files = [file for file in os.listdir(args.backgrounds_dir) if file.endswith('.jpg')]
 
     if args.quick_test == True:
-        for image in handwriting_files[0:1]:
+        for image in handwriting_files[0:args.quick_test_number]:
             add_background(image, args, background_files)
     else:
         for image in tqdm(handwriting_files):
